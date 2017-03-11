@@ -99,14 +99,11 @@ static inline int ofp_debug_logging_enabled(void)
 #define _OFP_LOG(level, fmt, ...) do {					\
 		if (level > ofp_loglevel)				\
 			break;						\
-		fprintf(stderr, "%s %d %d:%u %s:%d] " fmt "\n",		\
-			(level == OFP_LOG_ERROR)   ? "E" :		\
-			(level == OFP_LOG_WARNING) ? "W" :		\
-			(level == OFP_LOG_INFO)    ? "I" :		\
-			(level == OFP_LOG_DEBUG)   ? "D" : "?",		\
-			ofp_timer_ticks(0),				\
-			odp_cpu_id(), (unsigned int) pthread_self(),	\
-			__FILENAME__, __LINE__,				\
+		fprintf(stderr, "OFP: %s: " fmt "\n",			\
+			(level == OFP_LOG_ERROR)   ? "ERROR" :		\
+			(level == OFP_LOG_WARNING) ? "WARNING" :	\
+			(level == OFP_LOG_INFO)    ? "INFO" :		\
+			(level == OFP_LOG_DEBUG)   ? "DEBUG" : "?",	\
 			##__VA_ARGS__);					\
 	} while (0)
 

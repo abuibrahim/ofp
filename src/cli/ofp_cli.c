@@ -97,7 +97,7 @@ static void parse(struct cli_conn *conn, int extra);
 static void close_connection(struct cli_conn *conn)
 {
 	(void)conn;
-	OFP_DBG("Closing connection...\r\n");
+	OFP_DBG("Closing connection...");
 	close_cli = 1; /* tell server to close the socket */
 }
 
@@ -1158,7 +1158,7 @@ static void cli_process_conf_file(char *config_file_name)
 	if (config_file_name != NULL) {
 		f = fopen(config_file_name, "r");
 		if (!f) {
-			OFP_ERR("OFP configuration file not found.\n");
+			OFP_ERR("configuration file not found.");
 			return;
 		}
 
@@ -1173,7 +1173,7 @@ static void cli_process_conf_file(char *config_file_name)
 		fclose(f);
 	}
 	else {
-		OFP_DBG("OFP configuration file not set.\n");
+		OFP_DBG("configuration file not set");
 	}
 }
 
@@ -1384,7 +1384,7 @@ static int cli_read(int fd)
 
 	//receive data from client
 	if (recv(fd, &c, 1, 0) <= 0) {
-		OFP_ERR("Failed to recive data on socket: %s", strerror(errno));
+		OFP_DBG("Failed to receive data on socket: %s", strerror(errno));
 		close_connection(conn);
 		return -1;
 	}
@@ -1567,7 +1567,7 @@ static void cli_sa_accept(int fd)
 	conn->fd = fd;
 	send(fd, telnet_echo_off, sizeof(telnet_echo_off), 0);
 
-	OFP_DBG("new sock %d opened\r\n", conn->fd);
+	OFP_DBG("new sock %d opened", conn->fd);
 }
 
 #define OFP_SERVER_PORT 2345
@@ -1596,16 +1596,16 @@ static void *cli_server(void *arg)
 
 	config_file_name = (char *)arg;
 
-	OFP_INFO("CLI server started on core %i\n", odp_cpu_id());
+	OFP_INFO("CLI server started on core %i", odp_cpu_id());
 
 	if (ofp_init_local()) {
-		OFP_ERR("Error: OFP local init failed.\n");
+		OFP_ERR("OFP local init failed.");
 		return NULL;
 	}
 
 	ofp_global_cfg = ofp_get_global_config();
 	if (!ofp_global_cfg) {
-		OFP_ERR("Error: Failed to retrieve global configuration.");
+		OFP_ERR("Failed to retrieve global configuration.");
 		return NULL;
 	}
 
@@ -1615,13 +1615,13 @@ static void *cli_server(void *arg)
 
 	cli_serv_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (cli_serv_fd < 0) {
-		OFP_ERR("cli serv socket\n");
+		OFP_ERR("cli serv socket");
 		return NULL;
 	}
 
 	if (setsockopt(cli_serv_fd, SOL_SOCKET,
 		   SO_REUSEADDR, (void *)&reuse, sizeof(reuse)) < 0)
-		OFP_ERR("cli setsockopt (SO_REUSEADDR)\n");
+		OFP_ERR("cli setsockopt (SO_REUSEADDR)");
 
 	memset(&my_addr, 0, sizeof(my_addr));
 	my_addr.sin_family = AF_INET;
@@ -1630,7 +1630,7 @@ static void *cli_server(void *arg)
 
 	if (bind(cli_serv_fd, (struct sockaddr *)&my_addr,
 		 sizeof(struct sockaddr)) < 0) {
-		OFP_ERR("serv bind\n");
+		OFP_ERR("serv bind");
 		return NULL;
 	}
 
@@ -1662,7 +1662,7 @@ static void *cli_server(void *arg)
 				close(cli_tmp_fd);
 			cli_tmp_fd = -1;
 			close_cli = 0;
-			OFP_DBG("CLI connection closed\r\n");
+			OFP_DBG("CLI connection closed");
 		}
 
 		if (r < 0)
@@ -1684,14 +1684,14 @@ static void *cli_server(void *arg)
 			}
 			cli_sa_accept(cli_tmp_fd);
 			cli_send_welcome_banner(cli_tmp_fd);
-			OFP_DBG("CLI connection established\r\n");
+			OFP_DBG("CLI connection established");
 		}
 
 	if (cli_tmp_fd > 0 && FD_ISSET(cli_tmp_fd, &fds)) {
 			if (cli_read(cli_tmp_fd)) {
 				close(cli_tmp_fd);
 				cli_tmp_fd = -1;
-				OFP_DBG("CLI connection closed\r\n");
+				OFP_DBG("CLI connection closed");
 			}
 		}
 	} /* while () */
@@ -1723,11 +1723,11 @@ int ofp_start_cli_thread(odp_instance_t instance, int core_id, char *conf_file)
 
 	ofp_global_cfg = ofp_get_global_config();
 	if (!ofp_global_cfg) {
-		OFP_ERR("Error: Failed to retrieve global configuration.");
+		OFP_ERR("Failed to retrieve global configuration.");
 		return -1;
 	}
 	if (ofp_global_cfg->cli_thread_is_running) {
-		OFP_ERR("Error: CLI thread is running.");
+		OFP_ERR("CLI thread is running.");
 		return -1;
 	}
 	odp_cpumask_zero(&cpumask);
@@ -1756,7 +1756,7 @@ int ofp_stop_cli_thread(void)
 
 	ofp_global_cfg = ofp_get_global_config();
 	if (!ofp_global_cfg) {
-		OFP_ERR("Error: Failed to retrieve global configuration.");
+		OFP_ERR("Failed to retrieve global configuration.");
 		return -1;
 	}
 
